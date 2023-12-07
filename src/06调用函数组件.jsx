@@ -10,3 +10,14 @@ root.render(
     <FunComponent></FunComponent>
   </>
 );
+
+console.log(React.createElement(FunComponent, {
+  title: "\u6211\u662F\u6807\u9898",
+  x: 10,
+  y: "10",
+  data: [100, 200],
+  className: "box",
+  style: {
+    fontSize: '20px'
+  }
+}))
