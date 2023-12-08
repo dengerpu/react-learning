@@ -1,18 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FunComponent = function (props) {
-  console.log("父传子数据", props)
-  // 接收到的对象是被冻结了的
-  console.log(Object.isFrozen(props));
-  let {x, y, title, children} = props;
-  // 可以通过这种方式实现对传过来的数据值的修改
-  let z = props.z
-  z = 123
-  // 也可以以这种方式赋值默认值
-  // let {x = 1, y = 1, title} = props;
-  // title = title ? title : '默认标题';
-
+const SlotComponent = function (props) {
+  let {children} = props;
   // 要对children的类型做处理
   // 可以基于React.Children对象中提供的方法，对props.children做处理:count\forEach\map\toArray...
   // 好处:在这些方法的内部，已经对children的各种形式做了处理
@@ -22,25 +12,36 @@ const FunComponent = function (props) {
   // } else if (!Array.isArray(children)) {
   //   children = [children]
   // }
+  let headerSlot = [],
+  contentSlot = [],
+  footerSlot = [];
+  children.forEach(child => {
+    // 传递进来的插槽信息，都是编译为virtualDOM后传递进来的「签」
+    let {slot} = child.props;
+    if(slot === 'header') {
+      headerSlot.push(child)
+    } else if (slot === 'content') {
+      contentSlot.push(child);
+    } else {
+      footerSlot.push(child);
+    }
+  })
   return <div>
-    <h2>{title}</h2>
-    {children[0]}
+    {headerSlot}
     <hr/>
-    我是函数组件<br/>
-    {children[1]}
-    <p>x: {x}</p>
-    <p>y: {y}</p>
-    <p>z: {z}</p>
+    {contentSlot}
+    <br />
+    {footerSlot}
   </div>;
 }
 // 设置默认值
-FunComponent.defaultProps = {
+SlotComponent.defaultProps = {
   x: 1,
   y: "11",
   title: "默认标题"
 }
 // 设置其他校验规则
-FunComponent.propTypes = {
+SlotComponent.propTypes = {
   // 类型字符串，必传
   title: PropTypes.string.isRequired,
   // 类型是数字
@@ -54,4 +55,4 @@ FunComponent.propTypes = {
   ]),
   data: PropTypes.arrayOf(PropTypes.number)
 }
-export default FunComponent;
+export default SlotComponent;
