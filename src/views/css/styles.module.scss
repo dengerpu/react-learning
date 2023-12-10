@@ -1,0 +1,29 @@
+.dialog_container {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #ccc;
+  .dialog_container_header {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+    border-bottom: 1px solid #ccc;
+    span:nth-child(2) {
+      cursor: pointer;
+    }
+  }
+  .dialog_container_content {
+    height: 80%;
+  }
+  .dialog_container_footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 10%;
+    border-top: 1px solid #eee;
+    button {
+      margin: 0 5px;
+    }
+  }
+}
