@@ -9,7 +9,7 @@ root.render(
     <Vote></Vote>
   </>
 );
-
+ 
 class Parent {
   constructor(x,y) {
     // new的时候，执行的构造函数「可写可不写:需要接受传递进来的实参信息，才需要设置constructor」
