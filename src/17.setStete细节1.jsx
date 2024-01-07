@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/SetState2';
+import Demo from './views/SetState';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
