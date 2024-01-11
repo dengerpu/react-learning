@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import zhCN from 'antd/locale/zh_CN'
 import { ConfigProvider } from 'antd';
+import './index.css'
 import Task from './views/Task';
 
 
