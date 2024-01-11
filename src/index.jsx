@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/SyntheticBaseEvent1.jsx';
+import Demo from './views/ListBindEvent.jsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
