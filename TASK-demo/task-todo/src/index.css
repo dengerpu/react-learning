@@ -1,1 +1,8 @@
 @import './assets/css/reset.min.css';
+
+.ant-btn {
+  border-radius: 0;
+}
+.ant-modal-content {
+  border-radius: 0!important;
+}
