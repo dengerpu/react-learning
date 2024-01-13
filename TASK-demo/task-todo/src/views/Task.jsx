@@ -2,6 +2,9 @@ import React from 'react'
 import { flushSync } from 'react-dom'
 import { Button, Tag, Table, Popconfirm, Modal, Form, Input, DatePicker, message } from 'antd';
 import '../assets/css/task.scss'
+import { getTaskList, addTask, removeTask, completeTask } from '../api';
+
+
 const zero = function zero(text) {
   text = String(text);
   return text.length < 2 ? '0' + text : text;
@@ -32,7 +35,7 @@ class Task extends React.Component {
       dataIndex: 'state',
       align: 'center',
       width: '10%',
-      render: text => +text === 1 ? '未完成' : '已完成'
+      render: text => +text === 1 ? <span style={{color: 'red'}}>未完成</span> : <span style={{color: 'green'}}>已完成</span>
     },
     {
       title: '完成时间',
@@ -67,25 +70,31 @@ class Task extends React.Component {
     }
   ]
   state = {
-    tableData: [
-      {
-        "id":1,
-        "task":"测试11111111",
-        "state":1,
-        "time":"2022-12-01 23:59:59",
-        "complete":"2022-11-30 18:02:38"
-      },
-      {
-        "id":4,
-        "task":"我们一定要好好的把这个案例练习一下！！",
-        "state":2,
-        "time":"2022-12-01 23:59:59",
-        "complete":"2022-11-30 18:02:38"
-      }
-    ],
+    tableData: [], // 表格数据
     modalVisible: false,  // 弹窗是否显示
     saveTaskconfirmLoading: false, // 提交任务loading
-    selectIndex: 0
+    tableLoading: false, // 表格loading
+    selectIndex: 0,
+    pageInfo: {
+      current: 1, // 当前页数
+      pageSize: 2, // 每页条数
+      showSizeChanger: true, // 显示分页切换器
+      showQuickJumper: true, // 显示快速跳转至某页
+      pageSizeOptions: [1,2,5,10],
+      total: 0,
+      showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 条`,
+      onChange: (page, pageSize) => this.pageChange(page, pageSize)
+    }
+  }
+
+  // 页码切换事件
+  pageChange = (page, pageSize) => {
+    console.log('页码发生变化')
+    flushSync(() => {
+      this.setState({ pageInfo: { ...this.state.pageInfo, current: page, pageSize } });
+    })
+    // console.log('页码发生变化')
+    this.queryData()
   }
 
   // 完整状态切换
@@ -106,17 +115,59 @@ class Task extends React.Component {
     flushSync(() => {
       this.setState({selectIndex: index})
     });
-    console.log(this.state.selectIndex)
+    // 重置当前页的参数
+    flushSync(() => {
+      this.setState({ pageInfo: { ...this.state.pageInfo, current: 1 } });
+    })
+    this.queryData();
+  }
+
+  // 获取任务列表
+  queryData = async () => {
+    let {selectIndex} = this.state;
+    this.setState({tableLoading: true})
+    try {
+      let { code, list, page, total } = await getTaskList(selectIndex, this.state.pageInfo.current, this.state.pageInfo.pageSize);
+      if(+code !== 0) { // 0代表获取成功
+        list = []
+      }
+      console.log('请求获取到的数据', list)
+      this.setState({
+        tableData:list,
+        pageInfo: {
+          ...this.state.pageInfo,
+          current: +page,
+          total: +total
+        }
+      })
+    } catch (error) {
+      message.error('获取任务列表失败')
+    }
+    this.setState({tableLoading: false})
   }
 
   // 删除任务
-  removeTask = (id) => {
-    console.log(id)
+  removeTask = async (id) => {
+    let { code } = await removeTask(id);
+    if(+code !== 0) {
+      message.error('删除任务失败')
+      return
+    } else {
+      this.queryData()
+      message.success('删除任务成功')
+    } 
   }
 
   // 修改任务状态
-  updateTaskState = (id) => {
-    console.log(id)
+  updateTaskState = async (id) => {
+    let {code} = await completeTask(id);
+    if(+code !== 0) {
+      message.error('修改任务状态失败')
+      return
+    } else {
+      this.queryData()
+      message.success('修改任务状态成功')
+    } 
   }
 
   // 提交任务
@@ -128,15 +179,40 @@ class Task extends React.Component {
       time = time.format('YYYY-MM-DD HH:mm:ss');
       this.setState({saveTaskconfirmLoading: true})
       // 向服务器端发送请求
-      console.log(task, time)
+      let { code } = await addTask(task, time);
+      if(+code !== 0) {
+        message.error('添加任务失败');
+      } else {
+        // 关闭弹框
+        this.closeMode();
+        // 获取最新的数据
+        this.queryData();
+        message.success('添加任务成功');
+      }
     }catch (_) {
       message.error('请填写完整信息');
     }
+    this.setState({saveTaskconfirmLoading: false})
+  }
+
+  // 关闭弹框事件
+  closeMode = () => {
+    this.setState({
+      modalVisible: false,
+      saveTaskconfirmLoading: false
+    })
+    this.formRef.resetFields();
+  }
+
+  componentDidMount() {
+    this.queryData();
+    console.log('获取到的表格数据', this.state.tableData)
   }
 
   render() {
     console.log('视图更新')
-    let {tableData, modalVisible, saveTaskconfirmLoading, selectIndex} = this.state
+    let {tableData, modalVisible, saveTaskconfirmLoading, selectIndex, tableLoading, pageInfo} = this.state
+    console.log('分页器的配置', pageInfo)
     return <div className='task_box'>
       <div className="task_header">
         <h1>TASK OA任务管理系统</h1>
@@ -153,15 +229,11 @@ class Task extends React.Component {
           })}
         </div>
         <div className='task_content_table'>
-          <Table dataSource={tableData} columns={this.columns}  rowKey="id"/>
+          <Table dataSource={tableData} loading={tableLoading} columns={this.columns}  rowKey="id" pagination={pageInfo}/>
         </div>
       </div>
       {/* 新增任务弹出框 */}
-      <Modal title="新增任务窗口" open={modalVisible} maskClosable={false} okText="提交信息" onCancel={() => {
-        this.setState({
-          modalVisible: false
-        })
-      }} onOk={this.saveTask} confirmLoading={saveTaskconfirmLoading}>
+      <Modal title="新增任务窗口" open={modalVisible} maskClosable={false} okText="提交信息" onCancel={this.closeMode} onOk={this.saveTask} confirmLoading={saveTaskconfirmLoading}>
         <Form ref={x => this.formRef = x} layout="vertical" initialValues={{ task: '', time: '' }} validateTrigger="onBlur">
           <Form.Item label="任务描述" name="task" rules={[
             { required: true, message: '任务描述是必填项' }, 
