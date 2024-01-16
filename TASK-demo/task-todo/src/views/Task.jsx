@@ -1,5 +1,4 @@
-import React from 'react'
-import { flushSync } from 'react-dom'
+import React, { useEffect, useState, useRef } from 'react'
 import { Button, Tag, Table, Popconfirm, Modal, Form, Input, DatePicker, message } from 'antd';
 import '../assets/css/task.scss'
 import { getTaskList, addTask, removeTask, completeTask } from '../api';
@@ -15,9 +14,9 @@ const formatTime = function formatTime(time) {
   return `${zero(month)}-${zero(day)} ${zero(hours)}:${zero(minutes)}`;
 }
 
-class Task extends React.Component {
+const Task = function Task() {
   /* 表格列的数据 */
-  columns = [
+  const columns = [
     {
       title: '编号',
       dataIndex: 'id',
@@ -55,13 +54,13 @@ class Task extends React.Component {
         return <>
           <Popconfirm
             title="您确定要删除此任务吗"
-            onConfirm={this.removeTask.bind(this, id)}
+            onConfirm={deleteTask.bind(this, id)}
           >
             <Button type="link">删除</Button>
           </Popconfirm>
           
           {
-            +state !== 2 ? <Popconfirm title="您确定要完成此任务吗" onConfirm={this.updateTaskState.bind(null, id)}>
+            +state !== 2 ? <Popconfirm title="您确定要完成此任务吗" onConfirm={updateTaskState.bind(null, id)}>
               <Button type="link">完成</Button>
             </Popconfirm> : null
           }
@@ -69,172 +68,174 @@ class Task extends React.Component {
       }
     }
   ]
-  state = {
-    tableData: [], // 表格数据
-    modalVisible: false,  // 弹窗是否显示
-    saveTaskconfirmLoading: false, // 提交任务loading
-    tableLoading: false, // 表格loading
-    selectIndex: 0,
-    pageInfo: {
-      current: 1, // 当前页数
-      pageSize: 2, // 每页条数
-      showSizeChanger: true, // 显示分页切换器
-      showQuickJumper: true, // 显示快速跳转至某页
-      pageSizeOptions: [1,2,5,10],
-      total: 0,
-      showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 条`,
-      onChange: (page, pageSize) => this.pageChange(page, pageSize)
-    }
+
+   // 分页配置信息
+   const pageProps = {
+    current: 1, // 当前页数
+    pageSize: 2, // 每页条数
+    showSizeChanger: true, // 显示分页切换器
+    showQuickJumper: true, // 显示快速跳转至某页
+    pageSizeOptions: [1,2,5,10],
+    total: 0,
+    showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 条`,
+    onChange: (page, pageSize) => pageChange(page, pageSize)
   }
+
+  let [tableData, setTableData] = useState([]); // 表格数据
+  let [pageInfo, setPageInfo] = useState(pageProps); // 分页信息
+  let [modalVisible, setModalVisible] = useState(false); // 弹窗是否显示
+  let [tableLoading, setTableLoading] = useState(false); // 表格loading
+  let [saveTaskconfirmLoading, setSaveTaskconfirmLoading] = useState(false); // 提交任务loading
+  let [selectIndex, setSelectIndex] = useState(0); // 选中项的索引
+
+
+  // let formRef = useRef(null); // 表单ref
+  // 这种方式ref = {formRef} 获取实例： formRef.current
+ 
+  // ant-design提供的
+   let [formRef] = Form.useForm(); // 表单ref
+
 
   // 页码切换事件
-  pageChange = (page, pageSize) => {
-    console.log('页码发生变化')
-    flushSync(() => {
-      this.setState({ pageInfo: { ...this.state.pageInfo, current: page, pageSize } });
+  const pageChange = (page, pageSize) => {
+    setPageInfo({
+      ...pageInfo,
+      current: page,
+      pageSize
     })
+    // queryData()
     // console.log('页码发生变化')
-    this.queryData()
   }
 
+  useEffect(() => {
+    queryData()
+    // console.log('分页信息发生改变')
+  }, [pageInfo.current, pageInfo.pageSize, selectIndex])
+
+
   // 完整状态切换
-  changeIndex = (index) => {
-    if(this.state.selectIndex === index) return
+  const changeIndex = (index) => {
+    // 这个可以不要，因为useState存在性能优化，值相同视图不更新
+    // if(selectIndex === index) return
     
-    // this.setState({selectIndex: index}) 
-    // 直接这样 this.state.selectIndex还是原来的值，并未及时改变
-    // 如果在这个时候发送请求，获取到的selectIndex还是上一次的值
-
-    // 解决方法1
-    // this.setState({selectIndex: index}, () => {
-    //   // 发送请求获取数据
-    //   console.log(this.state.selectIndex)
+    // 这样写是错误的，因为闭包问题，queryData获取的上下文的setSelectIndex还是上次的
+    // flushSync(() => {
+    //   setSelectIndex(index)
     // })
-
-    // 解决方法2
-    flushSync(() => {
-      this.setState({selectIndex: index})
-    });
-    // 重置当前页的参数
-    flushSync(() => {
-      this.setState({ pageInfo: { ...this.state.pageInfo, current: 1 } });
+    // queryData();
+    setSelectIndex(index);
+    setPageInfo((prev) => {
+      return {
+        ...prev,
+        current: 1
+      }
     })
-    this.queryData();
   }
 
   // 获取任务列表
-  queryData = async () => {
-    let {selectIndex} = this.state;
-    this.setState({tableLoading: true})
+  const queryData = async () => {
+    setTableLoading(true)
     try {
-      let { code, list, page, total } = await getTaskList(selectIndex, this.state.pageInfo.current, this.state.pageInfo.pageSize);
+      let { code, list, page, total } = await getTaskList(selectIndex, pageInfo.current, pageInfo.pageSize);
       if(+code !== 0) { // 0代表获取成功
         list = []
       }
       console.log('请求获取到的数据', list)
-      this.setState({
-        tableData:list,
-        pageInfo: {
-          ...this.state.pageInfo,
-          current: +page,
-          total: +total
-        }
+      setTableData(list)
+      setPageInfo({
+        ...pageInfo,
+        total: +total
       })
     } catch (error) {
       message.error('获取任务列表失败')
     }
-    this.setState({tableLoading: false})
+    setTableLoading(false)
   }
 
   // 删除任务
-  removeTask = async (id) => {
+  const deleteTask = async (id) => {
     let { code } = await removeTask(id);
     if(+code !== 0) {
       message.error('删除任务失败')
       return
     } else {
-      this.queryData()
+      queryData()
       message.success('删除任务成功')
     } 
   }
 
   // 修改任务状态
-  updateTaskState = async (id) => {
+  const updateTaskState = async (id) => {
     let {code} = await completeTask(id);
     if(+code !== 0) {
       message.error('修改任务状态失败')
       return
     } else {
-      this.queryData()
+      queryData()
       message.success('修改任务状态成功')
     } 
   }
 
   // 提交任务
-  saveTask = async () => {
+  const saveTask = async () => {
     try {
       // 表单校验
-      await this.formRef.validateFields()
-      let {task , time} = this.formRef.getFieldsValue();
+      await formRef.validateFields()
+      let {task , time} = formRef.getFieldsValue();
       time = time.format('YYYY-MM-DD HH:mm:ss');
-      this.setState({saveTaskconfirmLoading: true})
+      setSaveTaskconfirmLoading(true)
       // 向服务器端发送请求
       let { code } = await addTask(task, time);
       if(+code !== 0) {
         message.error('添加任务失败');
       } else {
         // 关闭弹框
-        this.closeMode();
+        closeMode();
         // 获取最新的数据
-        this.queryData();
+        queryData();
         message.success('添加任务成功');
       }
     }catch (_) {
       message.error('请填写完整信息');
     }
-    this.setState({saveTaskconfirmLoading: false})
+    setSaveTaskconfirmLoading(false)
   }
 
   // 关闭弹框事件
-  closeMode = () => {
-    this.setState({
-      modalVisible: false,
-      saveTaskconfirmLoading: false
-    })
-    this.formRef.resetFields();
+  const closeMode = () => {
+    setModalVisible(false)
+    setSaveTaskconfirmLoading(false)
+    formRef.resetFields();
   }
 
-  componentDidMount() {
-    this.queryData();
-    console.log('获取到的表格数据', this.state.tableData)
-  }
+  // 页面第一次加载，发送请求获取数据
+  useEffect(() => {
+    queryData();
+    console.log('获取到的表格数据', tableData)
+  }, [])
 
-  render() {
-    console.log('视图更新')
-    let {tableData, modalVisible, saveTaskconfirmLoading, selectIndex, tableLoading, pageInfo} = this.state
-    console.log('分页器的配置', pageInfo)
-    return <div className='task_box'>
-      <div className="task_header">
-        <h1>TASK OA任务管理系统</h1>
-        <Button type="primary" onClick={() => {
-          this.setState({
-            modalVisible: true
-          })
-        }}>新增任务</Button>
+
+
+  return <div className='task_box'>
+    <div className="task_header">
+      <h1>TASK OA任务管理系统</h1>
+      <Button type="primary" onClick={() => {
+        setModalVisible(true)
+      }}>新增任务</Button>
       </div>
       <div className='task_content'>
         <div className='task_content_header'>
           {['全部', '未完成', '已完成'].map( (item, index) => {
-            return <Tag color={selectIndex === index ? '#1677ff' : ''} key={index} onClick={this.changeIndex.bind(null, index)}>{item}</Tag>
+            return <Tag color={selectIndex === index ? '#1677ff' : ''} key={index} onClick={changeIndex.bind(null, index)}>{item}</Tag>
           })}
         </div>
         <div className='task_content_table'>
-          <Table dataSource={tableData} loading={tableLoading} columns={this.columns}  rowKey="id" pagination={pageInfo}/>
+          <Table dataSource={tableData} loading={tableLoading} columns={columns}  rowKey="id" pagination={pageInfo}/>
         </div>
       </div>
       {/* 新增任务弹出框 */}
-      <Modal title="新增任务窗口" open={modalVisible} maskClosable={false} okText="提交信息" onCancel={this.closeMode} onOk={this.saveTask} confirmLoading={saveTaskconfirmLoading}>
-        <Form ref={x => this.formRef = x} layout="vertical" initialValues={{ task: '', time: '' }} validateTrigger="onBlur">
+      <Modal title="新增任务窗口" open={modalVisible} maskClosable={false} okText="提交信息" onCancel={closeMode} onOk={saveTask} confirmLoading={saveTaskconfirmLoading}>
+        <Form form={formRef} layout="vertical" initialValues={{ task: '', time: '' }} validateTrigger="onBlur">
           <Form.Item label="任务描述" name="task" rules={[
             { required: true, message: '任务描述是必填项' }, 
             { min: 6, message: '输入的内容至少6位及以上' }
@@ -248,8 +249,7 @@ class Task extends React.Component {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
-  }
+  </div>
 }
 
 export default Task;
