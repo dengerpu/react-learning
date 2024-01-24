@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/类组件通信/Vote';
+import Demo from './views/函数组件通信/Vote';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
