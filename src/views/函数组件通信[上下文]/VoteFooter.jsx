@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Button } from 'antd';
+import ThemeContext from "../../ThemeContext";
 
 const VoteFooter = function VoteFooter() {
+    let {change} = useContext(ThemeContext);
     return <div className="footer">
-        <Button type="primary">支持</Button>
-        <Button type="primary" danger>反对</Button>
+        <Button type="primary" onClick={change.bind(null, 'sup')}>支持</Button>
+        <Button type="primary" onClick={change.bind(null, 'opp')} danger>反对</Button>
     </div>;
 };
 export default VoteFooter;

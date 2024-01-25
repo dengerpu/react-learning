@@ -1,17 +1,35 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import './Vote.less';
 import VoteMain from './VoteMain';
 import VoteFooter from './VoteFooter';
+import ThemeContext from "../../ThemeContext";
 
 const Vote = function Vote() {
-    return <div className="vote-box">
-        <div className="header">
-            <h2 className="title">React是很棒的前端框架</h2>
-            <span className="num">0</span>
-        </div>
-        <VoteMain />
-        <VoteFooter />
-    </div>;
+    let [supNum, setSupNum] = useState(10);
+    let [oppNum, setOppNum] = useState(0);
+    const change = useCallback((type)=> {
+        if(type === 'sup') {
+            setSupNum(supNum + 1);
+        }else {
+            setOppNum(oppNum + 1);
+        }
+    }, [supNum, oppNum])
+    return (
+        <ThemeContext.Provider value={{
+            supNum,
+            oppNum,
+            change
+        }}>
+            <div className="vote-box">
+                <div className="header">
+                    <h2 className="title">React是很棒的前端框架</h2>
+                    <span className="num">{supNum + oppNum}</span>
+                </div>
+                <VoteMain supNum={supNum} oppNum = {oppNum} />
+                <VoteFooter change={change} />
+            </div>
+        </ThemeContext.Provider>
+    )
 };
 
 export default Vote;
