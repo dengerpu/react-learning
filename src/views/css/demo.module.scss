@@ -1,0 +1,16 @@
+// 全局类名
+:global(.personal) {
+  width: 300px;
+  height: 200px;
+}
+.personal span {
+  color: green;
+}
+.title {
+  color: red;
+  font-size: 16px;
+}
+.subTitle {
+  composes: title;
+  font-size: 14px;
+}
