@@ -1,14 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/CSSModuleDemo.jsx';
+import Demo from './views/样式/ReactJssDemo.jsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-setTimeout(function() {
-  root.render(
-    <>
-      <Demo></Demo>
-    </>
-  );
-}, 5000)
+root.render(
+  <>
+    <Demo></Demo>
+  </>
+);
 
