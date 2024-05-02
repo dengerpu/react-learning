@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
   }
 })
 
-// 函数组件
+// // 函数组件
 // const Menu = function () {
 //   let {box, list, link} = useStyles({
 //     size: 22,
@@ -48,6 +48,8 @@ const useStyles = createUseStyles({
 //           </ul>
 //         </div>)
 // }
+
+// export default Menu;
 
 // 在类组件中是无法使用hook函数的
 class Menu extends React.Component {
