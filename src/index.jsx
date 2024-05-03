@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/redux-工程化/index';
+import Demo from './views/react-redux/index'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
