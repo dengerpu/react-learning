@@ -4,7 +4,8 @@ import zhCN from 'antd/locale/zh_CN'
 import { ConfigProvider } from 'antd';
 import './index.css'
 import Task from './views/Task';
-import store from './store'
+// import store from './store'
+import store from './store-toolkit';
 import { Provider } from 'react-redux'
 
 

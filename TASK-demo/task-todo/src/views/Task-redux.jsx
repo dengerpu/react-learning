@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Button, Tag, Table, Popconfirm, Modal, Form, Input, DatePicker, message } from 'antd';
 import '../assets/css/task.scss'
 import { getTaskList, addTask, removeTask, completeTask } from '../api';
-import { useSelector, useDispatch } from 'react-redux';
-import { getAllTaskListAsync, removeTaskAction, updateTaskAction } from '../store-toolkit/features/taskSlice'
+import { connect } from 'react-redux';
+import action from '../store/actions';
 
 
 const zero = function zero(text) {
@@ -16,10 +16,8 @@ const formatTime = function formatTime(time) {
   return `${zero(month)}-${zero(day)} ${zero(hours)}:${zero(minutes)}`;
 }
 
-const Task = function Task() {
-  /* 获取公共状态和派发的方法 */
-  let { taskList, total } = useSelector(state => state.task);
-  let dispatch = useDispatch();
+const Task = function Task(props) {
+  let { taskList,total, queryAllList, deleteTaskById, updateTaskById } = props;
   /* 表格列的数据 */
   const columns = [
     {
@@ -139,7 +137,7 @@ const Task = function Task() {
   const queryData = async () => {
     setTableLoading(true)
     try {
-      await dispatch(getAllTaskListAsync(selectIndex, pageInfo.current, pageInfo.pageSize))
+      await queryAllList(selectIndex, pageInfo.current, pageInfo.pageSize)
     } catch (error) {
       message.error('获取任务列表失败')
     }
@@ -170,7 +168,7 @@ const Task = function Task() {
       message.error('删除任务失败')
       return
     } else {
-      dispatch(removeTaskAction(id));
+      deleteTaskById(id);
       message.success('删除任务成功')
     } 
   }
@@ -182,7 +180,7 @@ const Task = function Task() {
       message.error('修改任务状态失败')
       return
     } else {
-      dispatch(updateTaskAction(id));
+      updateTaskById(id);
       message.success('修改任务状态成功')
     } 
   }
@@ -257,4 +255,4 @@ const Task = function Task() {
   </div>
 }
 
-export default Task;
+export default connect(state => state.task, action.task)(Task);
