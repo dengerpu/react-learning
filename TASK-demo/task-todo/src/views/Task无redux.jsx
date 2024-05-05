@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Button, Tag, Table, Popconfirm, Modal, Form, Input, DatePicker, message } from 'antd';
 import '../assets/css/task.scss'
 import { getTaskList, addTask, removeTask, completeTask } from '../api';
-import { connect } from 'react-redux';
-import action from '../store/actions';
 
 
 const zero = function zero(text) {
@@ -16,8 +14,7 @@ const formatTime = function formatTime(time) {
   return `${zero(month)}-${zero(day)} ${zero(hours)}:${zero(minutes)}`;
 }
 
-const Task = function Task(props) {
-  let { taskList,total, queryAllList, deleteTaskById, updateTaskById } = props;
+const Task = function Task() {
   /* 表格列的数据 */
   const columns = [
     {
@@ -81,8 +78,7 @@ const Task = function Task(props) {
     pageSizeOptions: [1,2,5,10],
     total: 0,
     showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 条`,
-    onChange: (page, pageSize) => pageChange(page, pageSize),
-    onShowSizeChange: (current, size) => pageChange(current, size),
+    onChange: (page, pageSize) => pageChange(page, pageSize)
   }
 
   let [tableData, setTableData] = useState([]); // 表格数据
@@ -99,31 +95,34 @@ const Task = function Task(props) {
   // ant-design提供的
    let [formRef] = Form.useForm(); // 表单ref
 
-     // 页面第一次加载，发送请求获取数据
-  useEffect(() => {
-    queryData();
-  }, [])
-
 
   // 页码切换事件
   const pageChange = (page, pageSize) => {
-    console.log('页码切换或者页面大小发生变化', page, pageSize)
-    console.log('页面整体信息', pageInfo)
     setPageInfo({
       ...pageInfo,
       current: page,
-      pageSize,
-      total: +total
+      pageSize
     })
+    // queryData()
+    // console.log('页码发生变化')
   }
 
   useEffect(() => {
     queryData()
+    // console.log('分页信息发生改变')
   }, [pageInfo.current, pageInfo.pageSize, selectIndex])
 
 
   // 完整状态切换
   const changeIndex = (index) => {
+    // 这个可以不要，因为useState存在性能优化，值相同视图不更新
+    // if(selectIndex === index) return
+    
+    // 这样写是错误的，因为闭包问题，queryData获取的上下文的setSelectIndex还是上次的
+    // flushSync(() => {
+    //   setSelectIndex(index)
+    // })
+    // queryData();
     setSelectIndex(index);
     setPageInfo((prev) => {
       return {
@@ -137,29 +136,21 @@ const Task = function Task(props) {
   const queryData = async () => {
     setTableLoading(true)
     try {
-      await queryAllList(selectIndex, pageInfo.current, pageInfo.pageSize)
+      let { code, list, page, total } = await getTaskList(selectIndex, pageInfo.current, pageInfo.pageSize);
+      if(+code !== 0) { // 0代表获取成功
+        list = []
+      }
+      console.log('请求获取到的数据', list)
+      setTableData(list)
+      setPageInfo({
+        ...pageInfo,
+        total: +total
+      })
     } catch (error) {
       message.error('获取任务列表失败')
     }
     setTableLoading(false)
   }
-
-  // 依赖于redux中的全部任务 & 选中的状态信息，从全部任务中，筛选出表格需要的数据
-  useEffect(() => {
-    if(!taskList) {
-      setTableData([])
-    }
-    if(selectIndex !== 0) {
-      taskList = taskList.filter(item => +item.state === +selectIndex)
-    }
-    setTableData(taskList)
-    setPageInfo({
-      ...pageInfo,
-      total: +total
-    })
-  }, [taskList, selectIndex])
-
-
 
   // 删除任务
   const deleteTask = async (id) => {
@@ -168,7 +159,7 @@ const Task = function Task(props) {
       message.error('删除任务失败')
       return
     } else {
-      deleteTaskById(id);
+      queryData()
       message.success('删除任务成功')
     } 
   }
@@ -180,7 +171,7 @@ const Task = function Task(props) {
       message.error('修改任务状态失败')
       return
     } else {
-      updateTaskById(id);
+      queryData()
       message.success('修改任务状态成功')
     } 
   }
@@ -216,6 +207,12 @@ const Task = function Task(props) {
     setSaveTaskconfirmLoading(false)
     formRef.resetFields();
   }
+
+  // 页面第一次加载，发送请求获取数据
+  useEffect(() => {
+    queryData();
+    console.log('获取到的表格数据', tableData)
+  }, [])
 
 
 
@@ -255,4 +252,4 @@ const Task = function Task(props) {
   </div>
 }
 
-export default connect(state => state.task, action.task)(Task);
+export default Task;
