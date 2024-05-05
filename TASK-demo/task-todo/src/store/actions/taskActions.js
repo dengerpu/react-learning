@@ -3,6 +3,7 @@ import { getTaskList } from '../../api/index.js';
 // 添加任务
 const taskAction = {
   // 异步派发： 从服务器获取全局任务，同步到redux容器中
+  // 使用的是redux-promise中间件
   async queryAllList(selectIndex, current, pageSize) {
     let list = [];
     let total = 0;
