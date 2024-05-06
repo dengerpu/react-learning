@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-decorators": "^7.24.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -58,6 +60,7 @@
     "redux-thunk": "^3.1.0",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
+    "roadhog": "^2.5.0-beta.1",
     "sass": "^1.69.5",
     "sass-loader": "^12.3.0",
     "semver": "^7.3.5",
@@ -147,6 +150,20 @@
   "babel": {
     "presets": [
       "react-app"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ],
+      [
+         "@babel/plugin-proposal-class-properties",
+         {
+           "loose": true
+         }
+       ]
     ]
   }
 }
