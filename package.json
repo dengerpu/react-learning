@@ -39,6 +39,8 @@
     "less": "^4.2.0",
     "less-loader": "^8.1.1",
     "mini-css-extract-plugin": "^2.4.5",
+    "mobx": "^5.15.7",
+    "mobx-react": "^6.3.1",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
@@ -159,11 +161,11 @@
         }
       ],
       [
-         "@babel/plugin-proposal-class-properties",
-         {
-           "loose": true
-         }
-       ]
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ]
     ]
   }
 }
