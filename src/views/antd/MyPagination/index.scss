@@ -1,0 +1,9 @@
+.ant-pagination {
+  display: flex;
+  .ant-pagination-options {
+    display: flex!important;
+    .ant-pagination-options-quick-jumper {
+      order: -1!important;
+    }
+  }  
+}
