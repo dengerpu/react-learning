@@ -1,10 +1,8 @@
 import { useState }  from 'react';
 import { DatePicker, Button, ConfigProvider } from 'antd';
 import './daterange.scss';
-import zhCN from 'antd/es/locale/zh_CN'; // 引入语言包
-import moment from 'moment';
+import locale from 'antd/lib/date-picker/locale/zh_CN';
 import 'moment/locale/zh-cn';
-moment.locale('zh-cn'); // 注意这里设置 moment 必须放在有 import 的后面。
 
 const { RangePicker } = DatePicker;
 const DateRange = () => {
@@ -35,8 +33,8 @@ const DateRange = () => {
 
   return (
     <div>
-      <ConfigProvider locale={zhCN}>
       <RangePicker
+        locale={locale}
         separator='至'
         value={selectedDateRange}
         onChange={dates => setSelectedDateRange(dates)}
@@ -44,7 +42,6 @@ const DateRange = () => {
         onOpenChange={handleOpenChange} // 控制日期选择器弹框的显示隐藏
         open={pickerVisible} // 控制日期选择器弹框的显示隐藏
       />  
-      </ConfigProvider>
     </div>
   );
 };
