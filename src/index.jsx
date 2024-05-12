@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/antd/MyPagination'
+import Demo from './views/antd/MyDateRange/DateRange'
 
 import 'antd/dist/antd.css';
 
