@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Tag } from 'antd';
 import { generateRandomArray, getRandomInt } from './utils';
+import './index.scss';
 
 const MyTagList = () => {
   const data = generateRandomArray(getRandomInt(1, 50));
@@ -16,16 +17,22 @@ const MyTagList = () => {
     const container = containerRef.current;
     console.log('container', container);
     if (container) {
-      const containerWidth = container.offsetWidth;
+      const containerWidth = (container.offsetWidth - 20 - 2);
       const tags = container.getElementsByClassName('tag');
       let totalWidth = 0;
       let count = 0;
-      for (let i = 0; i < tags.length; i++) {
-        const tagWidth = tags[i].offsetWidth;
+      let height = 0; // 记录前一个值
+      for (let i = 0; i < tags.length; i++) { // 10代表左边距
+        const tagWidth = tags[i].offsetWidth + 10;  
         totalWidth += tagWidth;
-        if (totalWidth > containerWidth) {
-          count = i;
-          break;
+        count = i;
+        // 如果加了后一个能够容下，则继续加，不能加下，代表换行,totalWidth重置
+        if(i + 1 < tags.length && totalWidth + tags[i+1].offsetWidth + 10 > containerWidth) {
+          totalWidth = 0;
+          height++;
+          if(height === 2) {
+            break;
+          }
         }
       }
       const hiddenTags = data.length - count;
@@ -35,7 +42,11 @@ const MyTagList = () => {
         ellipsisTag.className = 'ellipsisTag';
         ellipsisTag.textContent = `+${hiddenTags} more`;
         ellipsisTag.addEventListener('click', handleEllipsisClick);
-        container.appendChild(ellipsisTag);
+        if(count + 1 < tags.length && totalWidth + 40  < containerWidth) {
+          container.insertBefore(ellipsisTag, tags[count + 1]);
+        } else {
+          container.insertBefore(ellipsisTag, tags[count]);
+        }
       }
     }
   };
@@ -47,13 +58,13 @@ const MyTagList = () => {
 
   return (
     <div style={{ display: 'flex', gap: 10 }}>
-      <div ref={containerRef} style={{ overflow: 'hidden', width: '300px', height: '70px', display: 'flex', flexWrap: 'wrap', gap: 10, padding: 10, border: '1px solid #000' }}>
+      <div ref={containerRef} style={{ overflow: 'hidden', width: '300px', height: '70px', display: 'flex', flexWrap: 'wrap', padding: 10, border: '1px solid #000' }}>
         {data.map((item, index) => (
           <Tag key={index} className="tag" color={item % 2 === 0 ? 'blue' : 'red'}>{item}</Tag>
         ))}
       </div>
       <div>对比</div>
-      <div style={{ width: '300px', height: '70px', display: 'flex', flexWrap: 'wrap', gap: 10, padding: 10, border: '1px solid #000' }}>
+      <div style={{ width: '300px', height: '70px', display: 'flex', flexWrap: 'wrap', padding: 10, border: '1px solid #000' }}>
         {data.map((item, index) => (
           <Tag key={index} className="tag" color={item % 2 === 0 ? 'blue' : 'red'}>{item}</Tag>
         ))}
