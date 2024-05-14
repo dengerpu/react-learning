@@ -4,6 +4,7 @@ import './daterange.scss';
 import locale from 'antd/lib/date-picker/locale/zh_CN';
 import 'moment/locale/zh-cn';
 import moment from 'moment';
+import DisableDate from './DisableDate';
 
 const { RangePicker } = DatePicker;
 const DateRange = () => {
@@ -77,6 +78,7 @@ const DateRange = () => {
         onOpenChange={handleOpenChange} // 控制日期选择器弹框的显示隐藏
         open={pickerVisible} // 控制日期选择器弹框的显示隐藏
       />  
+      <DisableDate></DisableDate>
     </div>
   );
 };
