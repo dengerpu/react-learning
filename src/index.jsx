@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Demo from './views/antd/MyDateRange/DateRange'
 import './views/mobx/autorun'
+import './views/mobx/computed'
 
 import 'antd/dist/antd.css';
 
