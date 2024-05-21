@@ -27,4 +27,6 @@ reaction(
 setTimeout(() => {
   store.x = 100;
   store.count = 200;
-}, 1000)
+}, 1000
+
+)

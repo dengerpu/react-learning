@@ -34,10 +34,13 @@ const CustomSelect = () => {
       onChange={handleChange}
       tokenSeparators={[',']}
       onInputKeyDown={handleInputKeyDown}
+      open={false}
+      allowClear={true}
+      autoFocus={true}
+      onClear={() => {
+        console.log('点击了清楚按钮');
+      }}
     >
-      {values.map((value) => (
-        <Option key={value} value={value}>{value}</Option>
-      ))}
     </Select>
   );
 };
