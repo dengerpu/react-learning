@@ -34,10 +34,6 @@ const EchartComponent = ({ lineData = [] }) => {
         chartInstance = echarts.init(chartRef.current);
         const option = {
             grid: {
-                top: '8%',
-                left: '-17%',
-                right: '1%',
-                bottom: '6%',
                 containLabel: false,
             },
             xAxis: [{
