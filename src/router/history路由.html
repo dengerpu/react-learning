@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <nav class="nav-box">
+    <a href="/">首页</a>
+    <a href="/product">产品中心</a>
+    <a href="/personal">个人中心</a>
+  </nav>
+  <div class="view-box"></div>
+  <script>
+    /*
+       History路由{浏览器路由} 
+         + 利用了H5中的HistoryAPI来实现页面地址的切换「可以不刷新页面」
+         + 根据不同的地址，到路由表中进行匹配，让容器中渲染不同的内容「组件」
+       问题：我们切换的地址，在页面不刷新的情况下是没有问题的，但是如果页面刷新，这个地址是不存在的，会报404错误！！此时我们需要服务器的配合：在地址不存在的情况下，也可以把主页面内容返回！！
+    */
+    const navBox = document.querySelector('.nav-box');
+    const viewBox = document.querySelector('.view-box');
+    // 路由表
+    const routes = [{
+      path: '/',
+      component: '首页内容'
+    }, {
+      path: '/product',
+      component: '产品中心内容'
+    }, {
+      path: '/personal',
+      component: '个人中心内容'
+    }];
+    // 路由匹配
+    const routerMatch = () => {
+      let path = location.pathname;
+      const route = routes.find(item => item.path === path);
+      if (route) {
+        viewBox.innerHTML = route.component;
+      } else {
+        viewBox.innerHTML = '404';
+      }
+    }
+    history.pushState({}, "", '/');
+    routerMatch();
+    navBox.addEventListener('click', (e) => {
+      const ele = e.target;
+      if (ele.tagName === 'A') {
+        e.preventDefault();
+        history.pushState({}, "", ele.href);
+        routerMatch();
+      }
+    })
+
+    /* 
+     popstate事件触发时机：
+     1）点击浏览器的前进、后退按钮
+     2）调用history.go/forward/back等方法
+     注意：history.pushState/replaceState不会触发此事件
+     */
+    window.addEventListener('popstate', routerMatch);
+  </script>
+</body>
+
+</html>
