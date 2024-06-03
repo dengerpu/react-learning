@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="router-box">
+    <a href="#/">首页</a>
+    <a href="#/product">产品中心</a>
+    <a href="#/personal">个人中心</a>
+  </div>
+  <div class="view-box"></div>
+  <script>
+    const viewBox = document.getElementsByClassName('view-box')[0];
+    // 路由表
+    const routes = [{
+        path: '/',
+        component: '首页内容'
+    }, {
+        path: '/product',
+        component: '产品中心内容'
+    }, {
+        path: '/personal',
+        component: '个人中心内容'
+    }];
+    // 页面第一次加载
+    location.hash = '#/';
+    // 监听路由变化
+    const matchRouter = function() {
+      let hash = location.hash.slice(1);
+      viewBox.innerHTML = routes.find(item => item.path === hash).component;
+    }
+    matchRouter();
+    window.addEventListener('hashchange', matchRouter)
+  </script>
+</body>
+</html>
