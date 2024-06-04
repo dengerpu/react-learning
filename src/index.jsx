@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Demo from './views/antd/MyDateRange/DateRange'
+import Demo from './router/基本使用/index.jsx';
 // import './views/mobx/autorun'
 // import './views/mobx/computed'
 
