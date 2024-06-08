@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter, Router, Route, Switch, Redirect, Link } from "react-router-dom";
+import { HashRouter, Route, Switch, Redirect, Link } from "react-router-dom";
 
 /* 导入组件 */
 import A from './views/A';
@@ -39,7 +39,8 @@ const Demo = () => {
         exact：设置匹配模式为精准匹配
       */}
       <Switch>
-        <Route path="/" component={A} exact />
+        <Redirect path="/" to="/a" exact></Redirect>
+        <Route path="/a" component={A} />
         <Route path="/b" component={B} />
         <Route path="/c" render = {
           () => {
