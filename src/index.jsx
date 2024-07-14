@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HashRouter } from 'react-router-dom';
 import Demo from './router/基本使用/index.jsx';
+import routes from './router/路由表/route.js';
+import RouterView from './router/路由表/index.jsx';
 // import './views/mobx/autorun'
 // import './views/mobx/computed'
 
@@ -15,8 +18,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <>
-    <Demo></Demo>
-    <Echarts></Echarts>
+    {/* <Demo></Demo>
+    <Echarts></Echarts> */}
+    <HashRouter>
+      <RouterView routes={routes}></RouterView>
+    </HashRouter>
   </>
 );
 
