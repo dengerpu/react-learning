@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-
+import { Suspense } from "react";
 const RouterView = function RouterView(props) {
     let { routes } = props;
     return <Switch>

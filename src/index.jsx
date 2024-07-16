@@ -6,6 +6,7 @@ import routes from './router/路由表/route.js';
 import RouterView from './router/路由表/index.jsx';
 // import './views/mobx/autorun'
 // import './views/mobx/computed'
+import HomeHead from './router/路由表/HomeHead.jsx';
 
 import 'antd/dist/antd.css';
 import Echarts from './views/echarts';
@@ -22,6 +23,7 @@ root.render(
     <Echarts></Echarts> */}
     <HashRouter>
       <RouterView routes={routes}></RouterView>
+      <HomeHead></HomeHead>
     </HashRouter>
   </>
 );
