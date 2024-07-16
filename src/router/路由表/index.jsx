@@ -17,7 +17,9 @@ const RouterView = function RouterView(props) {
                 if(exact) props.exact = true;
                 return <Route key={index} {...props} render={() => {
                     // 做一些特殊的处理，例如：登录态校验，导航守卫等
-                    return <Component></Component>
+                    return<Suspense fallback={<>加载中...</>}>
+                        <Component></Component>
+                    </Suspense> 
                 }}></Route>
             })
         }

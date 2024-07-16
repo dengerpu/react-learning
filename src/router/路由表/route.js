@@ -1,6 +1,5 @@
 import A from './views/A';
-import B from './views/B';
-import C from './views/C';
+import { lazy } from 'react';
 
 /* 
 一级路由 
@@ -29,12 +28,12 @@ const routes = [{
 }, {
     path: '/b',
     name: 'b',
-    component: B,
+    component: lazy(() => import('./views/B')),
     meta: {}
 }, {
     path: '/c',
     name: 'c',
-    component: C,
+    component: lazy(() => import('./views/C')),
     meta: {}
 }, {
     redirect: true,
