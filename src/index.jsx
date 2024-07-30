@@ -10,6 +10,7 @@ import HomeHead from './router/路由表/HomeHead.jsx';
 
 import 'antd/dist/antd.css';
 import Echarts from './views/echarts';
+import DisabledSelect from './views/antd/DisabledSelect'
 
 import './装饰器/decorator1.js'
 import './装饰器/decorator2.js'
@@ -22,6 +23,7 @@ root.render(
     {/* <Demo></Demo>
     <Echarts></Echarts> */}
     <HashRouter>
+      <DisabledSelect></DisabledSelect>
       <RouterView routes={routes}></RouterView>
       <HomeHead></HomeHead>
     </HashRouter>
