@@ -1,48 +1,67 @@
-import React, { useState } from 'react';
-import { Select, Tooltip } from 'antd';
-
-const { Option } = Select;
-
-const MySelect = () => {
-  const [selectedItems, setSelectedItems] = useState([]);
-  const maxSelection = 1;
-
-  const handleChange = (value) => {
-    if (value.length <= maxSelection) {
-      setSelectedItems(value);
-    }
-  };
-
-  const options = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
-    // 添加更多选项
-  ];
-
+import React from 'react';
+import { DownOutlined } from '@ant-design/icons';
+import { Select } from 'antd-v5';
+const MAX_COUNT = 3;
+const App = () => {
+  const [value, setValue] = React.useState(['Ava Swift']);
+  const suffix = (
+    <>
+      <span>
+        {value.length} / {MAX_COUNT}
+      </span>
+      <DownOutlined />
+    </>
+  );
   return (
     <Select
       mode="multiple"
-      value={selectedItems}
-      onChange={handleChange}
-      style={{ width: '300px' }}
-    >
-      {options.map((option) => {
-        const isDisabled = selectedItems.length >= maxSelection && !selectedItems.includes(option.value);
-        return (
-          <Option
-            key={option.value}
-            value={option.value}
-            disabled={isDisabled}
-          >
-            <Tooltip title={isDisabled ? '最多只能选中10个' : ''}>
-              {option.label}
-            </Tooltip>
-          </Option>
-        );
-      })}
-    </Select>
+      maxCount={MAX_COUNT}
+      value={value}
+      style={{
+        width: '100%',
+      }}
+      onChange={setValue}
+      suffixIcon={suffix}
+      placeholder="Please select"
+      options={[
+        {
+          value: 'Ava Swift',
+          label: 'Ava Swift',
+        },
+        {
+          value: 'Cole Reed',
+          label: 'Cole Reed',
+        },
+        {
+          value: 'Mia Blake',
+          label: 'Mia Blake',
+        },
+        {
+          value: 'Jake Stone',
+          label: 'Jake Stone',
+        },
+        {
+          value: 'Lily Lane',
+          label: 'Lily Lane',
+        },
+        {
+          value: 'Ryan Chase',
+          label: 'Ryan Chase',
+        },
+        {
+          value: 'Zoe Fox',
+          label: 'Zoe Fox',
+        },
+        {
+          value: 'Alex Grey',
+          label: 'Alex Grey',
+        },
+        {
+          value: 'Elle Blair',
+          label: 'Elle Blair',
+        },
+      ]}
+    />
   );
 };
-
-export default MySelect;
+export default App;
